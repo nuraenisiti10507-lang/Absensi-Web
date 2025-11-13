@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Absensi Siswa SMAN 1 Parakansalak</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #8ec5fc, #e0c3fc);
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+    h2 {
+      color: #4a4a4a;
+      margin-bottom: 20px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    button {
+      background: #6a5acd;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+    }
+    button:hover {
+      background: #5b4dc4;
+    }
+    #time {
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 10px;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Halaman Login -->
+  <div class="container" id="login-page">
+    <h2>Login Absensi</h2>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Konfirmasi</button>
+  </div>
+
+  <!-- Halaman Absensi -->
+  <div class="container hidden" id="absen-page">
+    <div id="time"></div>
+    <h2>Form Absensi Siswa</h2>
+    <input type="text" id="nama" placeholder="Nama Siswa">
+    <input type="text" id="kelas" placeholder="Kelas">
+    <input type="date" id="tanggal" placeholder="Tanggal">
+
+    <label for="keterangan">Keterangan:</label>
+    <select id="keterangan">
+      <option value="Hadir">Hadir</option>
+      <option value="Sakit">Sakit</option>
+      <option value="Izin">Izin</option>
+    </select>
+
+    <button onclick="kirimData()">Konfirmasi</button>
+    <p id="status"></p>
+  </div>
+
+  <script>
+    // LOGIN VALIDASI
+    function login() {
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value.trim();
+
+      if (user === "AINUN" && pass === "AINUN123") {
+        document.getElementById("login-page").classList.add("hidden");
+        document.getElementById("absen-page").classList.remove("hidden");
+      } else {
+        alert("Username atau Password salah!");
+      }
+    }
+
+    // WAKTU REALTIME
+    function updateTime() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('id-ID', { hour12: false });
+      document.getElementById("time").textContent = "Waktu: " + timeStr;
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    // KIRIM DATA KE GOOGLE SHEET
+    function kirimData() {
+      const nama = document.getElementById("nama").value.trim();
+      const kelas = document.getElementById("kelas").value.trim();
+      const tanggal = document.getElementById("tanggal").value.trim();
+      const keterangan = document.getElementById("keterangan").value;
+
+      if (!nama || !kelas || !tanggal) {
+        alert("Semua data harus diisi!");
+        return;
+      }
+
+      const scriptURL = https://script.google.com/macros/s/AKfycby6DW6Ir-eC-C0tc4GJ5HJM8prwwyNDQqvi4X5IdX3q8dM0QKKP4MvZ0TyubzxslMjB/exec
+
+      const formData = new FormData();
+      formData.append("NAMA SISWA", nama);
+      formData.append("KELAS", kelas);
+      formData.append("TANGGAL", tanggal);
+      formData.append("KETERANGAN", keterangan);
+
+      fetch(scriptURL, { method: "POST", body: formData })
+        .then(response => {
+          document.getElementById("status").textContent = "✅ Data berhasil dikirim!";
+          document.getElementById("status").style.color = "green";
+          document.getElementById("nama").value = "";
+          document.getElementById("kelas").value = "";
+          document.getElementById("tanggal").value = "";
+        })
+        .catch(error => {
+          document.getElementById("status").textContent = "❌ Gagal mengirim data!";
+          document.getElementById("status").style.color = "red";
+          console.error("Error!", error.message);
+        });
+    }
+  </script>
+
+</body>
+</html>
